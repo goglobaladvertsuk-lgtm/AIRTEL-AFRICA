@@ -1,0 +1,11 @@
+{
+  "name": "africa-50gb-offer",
+  "version": "1.0.0",
+  "description": "Africa 50GB Data + $500 Giveaway",
+  "scripts": {
+    "build": "echo 'No build step needed'"
+  },
+  "dependencies": {
+    "@netlify/functions": "^2.4.0"
+  }
+}
