@@ -15,6 +15,7 @@ exports.handler = async (event) => {
         return { statusCode: 204, headers };
     }
 
+    
     try {
         const path = event.path.replace('/.netlify/functions/send-to-telegram', '');
 
